@@ -6,7 +6,11 @@ import { CreateMilestones } from "./CreateMilestones";
 import { ReviewProject } from "./ReviewProject";
 import { Stepper } from "../../../components/Stepper/Stepper";
 
-const user = JSON.parse(sessionStorage.getItem("cryptoLancerUser"));
+var user = JSON.parse(sessionStorage.getItem("cryptoLancerUser"));
+if(user === null){
+  user = { username: "Guest", avatar: "https://avatars.githubusercontent.com/u/1?v=4" };
+}
+
 export const PostProject = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [projectDetails, setProjectDetails] = useState({

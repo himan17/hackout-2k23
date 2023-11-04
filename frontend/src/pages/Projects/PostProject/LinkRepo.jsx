@@ -41,9 +41,17 @@ export const LinkRepo = (props) => {
           <div className="mt-4 p-2 h-80 border border-gray-200 overflow-scroll no-scrollbar max-w-5xl">
             {!fetched ? (
               <>
-                <div className="text-center animate-bounce mt-8 text-gray-700">
-                  Fetching your repositories...
-                </div>
+                {!access_token?(
+                  <div className="text-center animate-bounce mt-8 text-gray-700">
+                    Connect to a GitHub account and choose a repository to proceed.
+                  </div>
+                ):
+                (
+                  <div className="text-center animate-bounce mt-8 text-gray-700">
+                    Fetching your repositories...
+                  </div>
+                )
+              }
               </>
             ) : (
               <>

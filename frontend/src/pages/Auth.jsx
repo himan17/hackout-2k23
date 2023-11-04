@@ -8,7 +8,11 @@ export const Auth = () => {
   let githubLogin = sessionStorage.getItem("githubToken");
   let user = JSON.parse(sessionStorage.getItem("cryptoLancerUser"));
   const { data } = useContext(AuthContext);
-
+  const logout = () => {
+    sessionStorage.removeItem("githubToken");
+    sessionStorage.removeItem("cryptoLancerUser");
+    navigate("/"); 
+  }
   return (
     <>
       <div className="absolute flex sm:flex-row flex-col z-20 top-8 right-8 ">
@@ -38,8 +42,10 @@ export const Auth = () => {
           onClick={() => {
             if (!githubLogin) {
               window.open(
-                `https://github.com/login/oauth/authorize?scope=user:email,repo&client_id=${CLIENT_ID}`
+                `https://github.com/login/oauth/authorize?scope=user:email,repo&client_id=${CLIENT_ID}`,"_self"
               );
+            }else{
+              logout();
             }
           }}
         >
