@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getAllProjectsByUser, getProjectsByParticipant } from "../services";
 import { ProjectCard } from "../../../../components/ProjectCard/ProjectCard";
 import { Navbar } from "../../../../components/Navbar/Navbar";
+import { RxCross2 } from "react-icons/rx";
 
 export const MyApplications = () => {
   const [posts, setPosts] = useState([]);
@@ -39,22 +40,30 @@ export const MyApplications = () => {
                   }
                 />
                 <p
-                  className={`p-2 font-medium rounded-b-md ${
-                    post?.assignee === user.username
+                  className={`p-2 font-medium rounded-b-md flex justify-between items-center ${post?.assignee === user.username
                       ? "bg-lime-200"
                       : "bg-yellow-200"
-                  }`}
-                >
-                  Status:{" "}
-                  <span
-                    className={` text-white px-2 py-1 rounded-full ${
-                      post?.assignee === user.username
-                        ? "bg-green-400"
-                        : "bg-orange-400"
                     }`}
-                  >
-                    {post?.assignee === user.username ? "Assigned" : "Pending"}
+                >
+                  <span>
+                    Status:{" "}
+                    <span
+                      className={` text-white px-2 py-1 rounded-full ${post?.assignee === user.username
+                          ? "bg-green-400"
+                          : "bg-orange-400"
+                        }`}
+                    >
+                      {post?.assignee === user.username ? "Assigned" : "Pending"}
+                    </span>
                   </span>
+                  <button title="Withdraw Application" className={`mx-2 bg-white p-2 rounded-full hover:scale-125 hover:outline hover:outline-2 hover:outline-red-300
+                    ${post?.assignee !== user.username
+                        ? "visible"
+                        : "invisible"
+                      }
+                  `}>
+                    <RxCross2/>
+                  </button>
                 </p>
               </div>
             ))}

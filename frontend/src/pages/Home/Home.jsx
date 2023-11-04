@@ -14,7 +14,7 @@ export const Home = () => {
 
   return (
     <>
-      <div className="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
+      <div className="relative isolate h-screen overflow-hidden bg-gray-900 py-24 sm:py-32">
         <img
           src={freelancer}
           alt=""
@@ -65,7 +65,9 @@ export const Home = () => {
             <div className="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold leading-7 text-white sm:grid-cols-2 md:flex lg:gap-x-10">
               <button
                 onClick={() => {
-                  if (sessionStorage.getItem("githubToken")) {
+                  // Github restriction removed 
+                  // if (sessionStorage.getItem("githubToken")) {
+                  if (true) {
                     navigate("/post-a-project");
                   } else {
                     toast("Please sign in to post a project", {

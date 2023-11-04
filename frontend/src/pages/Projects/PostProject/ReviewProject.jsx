@@ -9,5 +9,5 @@ export const ReviewProject = (props) => {
       setProject(project);
     });
   }, []);
-  return <div>{project}</div>;
+  return <div>Done</div>;
 };
