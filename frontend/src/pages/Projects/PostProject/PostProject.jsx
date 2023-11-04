@@ -5,10 +5,11 @@ import { LinkRepo } from "./LinkRepo";
 import { CreateMilestones } from "./CreateMilestones";
 import { ReviewProject } from "./ReviewProject";
 import { Stepper } from "../../../components/Stepper/Stepper";
+import { DeployContractAndAddFunds } from "./DeployContractAndAddFunds";
 
 const user = JSON.parse(sessionStorage.getItem("cryptoLancerUser"));
 export const PostProject = () => {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(4);
   const [projectDetails, setProjectDetails] = useState({
     finished: false,
     assigned: false,
@@ -41,6 +42,9 @@ export const PostProject = () => {
     {
       title: "Project Summary",
     },
+    {
+      title: "Deploy Contract and Add Funds"
+    }
   ];
   return (
     <>
@@ -75,6 +79,14 @@ export const PostProject = () => {
         )}
         {activeTab === 3 && (
           <ReviewProject
+            nextTab={nextTab}
+            prevTab={prevTab}
+            updateProjectDetails={updateProjectDetails}
+            projectDetails={projectDetails}
+          />
+        )}
+        {activeTab === 4 && (
+          <DeployContractAndAddFunds 
             nextTab={nextTab}
             prevTab={prevTab}
             updateProjectDetails={updateProjectDetails}
