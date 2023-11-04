@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { CLIENT_ID } from "./../config";
 import AuthContext from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import WalletProvider from "./wallet/WalletProvider";
 
 export const Auth = () => {
   const navigate = useNavigate();
@@ -74,6 +75,7 @@ export const Auth = () => {
           )}
           {githubLogin ? user.username : "Sign in with Github"}
         </button>
+        <WalletProvider />
       </div>
     </>
   );
