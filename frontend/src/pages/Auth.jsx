@@ -1,13 +1,65 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { CLIENT_ID } from "./../config";
 import AuthContext from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import Web3 from 'web3';
 
 export const Auth = () => {
   const navigate = useNavigate();
   let githubLogin = sessionStorage.getItem("githubToken");
   let user = JSON.parse(sessionStorage.getItem("cryptoLancerUser"));
   const { data } = useContext(AuthContext);
+  const [web3, setWeb3] = useState(null);
+  const [account, setAccount] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Load the wallet address and login status from local storage when the component is mounted
+    const storedAccount = localStorage.getItem('walletAccount');
+    const storedLoginStatus = localStorage.getItem('isLoggedIn');
+
+    if (storedAccount && storedLoginStatus === 'true') {
+      setAccount(storedAccount);
+      setIsLoggedIn(true);
+    }
+
+    if (window.ethereum) {
+      const web3Instance = new Web3(window.ethereum);
+      setWeb3(web3Instance);
+    } else {
+      console.log('No wallet provider detected. Please install Metamask or another Web3-enabled wallet.');
+    }
+  }, []);
+
+  const connectWallet = () => {
+    if (web3) {
+      window.ethereum.request({ method: 'eth_requestAccounts' })
+        .then((accounts) => {
+          const walletAddress = accounts[0];
+
+          // Store the wallet address and set login status to true
+          localStorage.setItem('walletAccount', walletAddress);
+          localStorage.setItem('isLoggedIn', 'true');
+
+          setAccount(walletAddress);
+          setIsLoggedIn(true);
+        })
+        .catch((error) => {
+          console.error('Error connecting to wallet:', error);
+        });
+    } else {
+      console.log('No wallet provider detected. Please install Metamask or another Web3-enabled wallet.');
+    }
+  };
+
+  const logout = () => {
+    // Clear the wallet address and set login status to false
+    localStorage.removeItem('walletAccount');
+    localStorage.setItem('isLoggedIn', 'false');
+    
+    setAccount(null);
+    setIsLoggedIn(false);
+  };
 
   return (
     <>
@@ -68,7 +120,27 @@ export const Auth = () => {
           )}
           {githubLogin ? user.username : "Sign in with Github"}
         </button>
+        <div>
+      {isLoggedIn ? (
+        <div
+          className=" mx-5 text-white hover:text-green-400 bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 "
+        >
+          <p>Connected Wallet: {account}</p>
+          <button
+          className="mx-2 text-white hover:text-green-400 bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 "
+          onClick={logout}>Logout</button>
+          {/* You can add additional functionality or components for authenticated users here */}
+        </div>
+      ) : (
+        <div class="bg-white">
+          <button onClick={connectWallet}>Connect Wallet</button>
+        </div>
+      )}
+    </div>
       </div>
+
+
     </>
   );
+
 };
