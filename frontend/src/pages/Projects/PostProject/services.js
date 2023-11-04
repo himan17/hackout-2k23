@@ -1,4 +1,4 @@
-import { addDoc, getDoc, doc, collection } from "firebase/firestore/lite";
+import { addDoc, getDoc, doc, collection, updateDoc } from "firebase/firestore/lite";
 import { db } from "../../../firebase/firebase";
 
 export async function createProjectInFB(projectDetails) {
@@ -25,5 +25,15 @@ export async function getProjectFromFB(id) {
       }
   } catch (er) {
     console.log("Error getting project from firebase: ", er);
+  }
+}
+
+export async function updateProjectInFB(id, newdata){
+  try {
+    const docRef = doc(db, "projects", id);
+    await updateDoc(docRef, newdata);
+    console.log("Document updated");
+  } catch (er) {
+    console.log("Error updating project in firebase: ", er);
   }
 }

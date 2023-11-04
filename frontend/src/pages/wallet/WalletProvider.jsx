@@ -37,7 +37,7 @@ function WalletProvider() {
       let accounts = await window.ethereum.request({   
         method: "eth_requestAccounts",                 
       })                                               
-      updateWallet(accounts)  
+      updateWallet(accounts[0])  
     } catch (err) {
       if (err.code === 4001) {
         // EIP-1193 userRejectedRequest error

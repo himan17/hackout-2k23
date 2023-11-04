@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
 
 contract CryptoLancerContract {
     address public owner;
@@ -13,6 +14,11 @@ contract CryptoLancerContract {
         curMilestone = 0;
         projectActive = true;
     }
+
+    receive() external payable {}
+
+    // * fallback function
+    fallback() external payable {}
 
     function addBudgetToContract() external payable {
         // The contract should accept and store additional funds sent by the owner.

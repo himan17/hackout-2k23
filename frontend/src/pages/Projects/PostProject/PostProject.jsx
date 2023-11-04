@@ -9,10 +9,11 @@ import { DeployContractAndAddFunds } from "./DeployContractAndAddFunds";
 
 const user = JSON.parse(sessionStorage.getItem("cryptoLancerUser"));
 export const PostProject = () => {
-  const [activeTab, setActiveTab] = useState(4);
+  const [activeTab, setActiveTab] = useState(0);
   const [projectDetails, setProjectDetails] = useState({
     finished: false,
     assigned: false,
+    deployed: false,
     username: user.username,
     user_avatar: user.avatar,
   });
@@ -38,9 +39,6 @@ export const PostProject = () => {
     },
     {
       title: "Create Milestones",
-    },
-    {
-      title: "Project Summary",
     },
     {
       title: "Deploy Contract and Add Funds"
@@ -78,14 +76,6 @@ export const PostProject = () => {
           />
         )}
         {activeTab === 3 && (
-          <ReviewProject
-            nextTab={nextTab}
-            prevTab={prevTab}
-            updateProjectDetails={updateProjectDetails}
-            projectDetails={projectDetails}
-          />
-        )}
-        {activeTab === 4 && (
           <DeployContractAndAddFunds 
             nextTab={nextTab}
             prevTab={prevTab}
