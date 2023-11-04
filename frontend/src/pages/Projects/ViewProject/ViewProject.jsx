@@ -12,6 +12,8 @@ export const ViewProject = (props) => {
   const [project, setProject] = useState({});
   const { projectId } = useParams();
   const pid = projectId || props.pid;
+  const [note, setNote] = useState("");
+
 
   const tabs = [
     { path: "/projects", title: "Projects" },
@@ -36,7 +38,7 @@ export const ViewProject = (props) => {
       sessionStorage.getItem("cryptoLancerUser") &&
       sessionStorage.getItem("githubToken")
     ) {
-      await toast.promise(addParticipantToFB(user.username, pid), {
+      await toast.promise(addParticipantToFB(user.username, pid, note), {
         loading: "Adding you to the project...",
         success: (data) => {
           return data;
@@ -51,6 +53,7 @@ export const ViewProject = (props) => {
       });
     }
   };
+
 
   return (
     <>
@@ -83,14 +86,22 @@ export const ViewProject = (props) => {
                 </span>
               </button>
             ) : (
-              <button
-                onClick={handleClick}
-                className="relative mt-4 inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-teal-300 to-lime-300 group-hover:from-teal-300 group-hover:to-lime-300 focus:ring-4 focus:outline-none focus:ring-lime-200"
-              >
-                <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white rounded-md group-hover:bg-opacity-0">
-                  Interested
-                </span>
-              </button>
+              <div className="flex items-center w-full">
+                <button
+                  onClick={handleClick}
+                  className="relative mt-4 inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-teal-300 to-lime-300 group-hover:from-teal-300 group-hover:to-lime-300 focus:ring-4 focus:outline-none focus:ring-lime-200"
+                >
+                  <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white rounded-md group-hover:bg-opacity-0">
+                    Interested
+                  </span>
+                </button>
+                <form className="mx-4 grow flex items-center">
+                  <label for="note">Type your message here: </label>
+                  <input className="grow border-2 mx-2 rounded-md p-2 " id="note" name="note" placeholder="Note to the owner" type="text"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}></input>
+                </form>
+              </div>
             )}
           </div>
         </div>

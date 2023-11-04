@@ -16,7 +16,7 @@ export async function getAllProjects() {
   }
 }
 
-export async function addParticipantToFB(participant, projectId) {
+export async function addParticipantToFB(participant, projectId, note) {
   try {
     // fetch all participants
     const projectCol = collection(db, "projects", projectId, "participants");
@@ -33,9 +33,10 @@ export async function addParticipantToFB(participant, projectId) {
 
     const docRef = await addDoc(
       collection(db, "projects", projectId, "participants"),
-      { participant, alloted: false, projectId }
+      { participant, alloted: false, projectId, note }
     );
     console.log("Document written with ID: ", docRef.id);
+    // console.log(note);
     return "Your request has been added to the project!";
   } catch (er) {
     console.log("Failed to fetch all projects", er);

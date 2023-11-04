@@ -163,6 +163,13 @@ export const ManageProject = () => {
                       <AiFillGithub className="text-2xl inline-block my-auto mx-1" />
                       {e?.participant}
                     </a>
+                    <div>
+                      {e?.note?
+                        <>{e.note}</>
+                      :
+                        <>Testing</>
+                      }
+                    </div>
                     <button
                       onClick={() => assignProject(e?.id, e?.participant)}
                       className="bg-blue-600 text-sm font-bold hover:bg-blue-400 py-1 px-2 text-white rounded-lg"
