@@ -157,22 +157,22 @@ export const ManageProject = () => {
                     className="bg-white m-1 my-2 flex flex-row justify-between p-2 rounded-lg"
                   >
                     <a
-                      className="font-medium text-sm text-lime-700 text-center"
+                      className="font-medium text-sm text-lime-700 text-center flex items-center"
                       href={`https://github.com/${e?.participant}`}
                     >
                       <AiFillGithub className="text-2xl inline-block my-auto mx-1" />
                       {e?.participant}
                     </a>
-                    <div>
+                    <div className={`${e?.note ? "mx-4 border p-4 text-center rounded-lg bg-gray-100":""}`}>
                       {e?.note?
                         <>{e.note}</>
                       :
-                        <>Testing</>
+                        <></>
                       }
                     </div>
                     <button
                       onClick={() => assignProject(e?.id, e?.participant)}
-                      className="bg-blue-600 text-sm font-bold hover:bg-blue-400 py-1 px-2 text-white rounded-lg"
+                      className="bg-blue-600 text-sm font-bold hover:bg-blue-400 p-3 text-white rounded-lg"
                     >
                       Assign
                     </button>
