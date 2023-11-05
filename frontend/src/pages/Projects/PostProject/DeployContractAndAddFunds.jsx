@@ -7,6 +7,7 @@ import {
   getContractBalance,
 } from "../../../contracts/services";
 import { toast } from "react-hot-toast";
+import { ethers } from "ethers";
 
 export const DeployContractAndAddFunds = (props) => {
   console.log(props.projectDetails);
@@ -28,9 +29,16 @@ export const DeployContractAndAddFunds = (props) => {
       const tl = toast.loading("Deploying contract on blockchain...");
       let milestonesArray = [];
       if (milestones) {
-        milestonesArray = milestones.map((milestone) => {
-          return Number(milestone.reward);
-        });
+        // convert the each number which is usd to wei
+        for (const ms of milestones) {
+          let usd = Number(ms.reward);
+          const ethAmount = usd * 0.001;
+
+          // Approve and transfer the converted ETH to the contract
+          const ethValue = ethers.utils.parseEther(ethAmount.toString());
+
+          milestonesArray.push(ethValue);
+        }
       } else {
         // for testing
         milestonesArray = [100, 200, 300];
@@ -120,8 +128,7 @@ export const DeployContractAndAddFunds = (props) => {
                   </span>
                 </p>
                 <p class="text-xs text-gray-400">
-                  Contract Balance:{" "}
-                  <span className="font-medium">{0} USD</span>
+                  Contract Balance: <span className="font-medium">{0} USD</span>
                 </p>
               </div>
             )}

@@ -31,7 +31,7 @@ contract CryptoLancerContract {
     }
 
     function mark_milestone_as_complete() public {
-        require(msg.sender == curAssignee, "Only the current assignee can mark a milestone as complete");
+        require(msg.sender == owner, "Only the owner can mark a milestone as complete");
         require(projectActive, "Project is not active");
         require(curMilestone < milestones.length, "All milestones are already completed");
         

@@ -2,6 +2,7 @@ import React from "react";
 import freelancer from "../../assets/freelancer2.jpg";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { ethers } from "ethers";
 
 const stats = [
   { name: "Ongoing Projects", value: "12" },
@@ -11,6 +12,49 @@ const stats = [
 
 export const Home = () => {
   const navigate = useNavigate();
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+  const checkAuth = async () => {
+    if (sessionStorage.getItem("githubToken")) {
+      const isMetaMaskConnected =
+        typeof window.ethereum !== "undefined" &&
+        window.ethereum.selectedAddress !== null;
+
+      if (!isMetaMaskConnected) {
+        toast("Please connect wallet", {
+          icon: "🙋🏻",
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
+        return false;
+      } else {
+        // update session storage username
+        const user = JSON.parse(sessionStorage.getItem("cryptoLancerUser"));
+        // get address
+        const signer = provider.getSigner();
+        const sender = await signer.getAddress();
+
+        user.address = sender;
+        sessionStorage.setItem("cryptoLancerUser", JSON.stringify(user));
+      }
+
+      return true;
+    } else {
+      toast("Please connect github", {
+        icon: "🙋🏻",
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+      return false;
+    }
+  };
 
   return (
     <>
@@ -65,19 +109,8 @@ export const Home = () => {
             <div className="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold leading-7 text-white sm:grid-cols-2 md:flex lg:gap-x-10">
               <button
                 onClick={() => {
-                  // Github restriction removed 
-                  // if (sessionStorage.getItem("githubToken")) {
-                  if (true) {
+                  if (checkAuth()) {
                     navigate("/post-a-project");
-                  } else {
-                    toast("Please sign in to post a project", {
-                      icon: "🙋🏻",
-                      style: {
-                        borderRadius: "10px",
-                        background: "#333",
-                        color: "#fff",
-                      },
-                    });
                   }
                 }}
                 className="hover:bg-white p-1 hover:text-green-400 hover:rounded-lg"
@@ -85,7 +118,11 @@ export const Home = () => {
                 Post a project <span aria-hidden="true">&rarr;</span>
               </button>
               <button
-                onClick={() => navigate("/projects")}
+                onClick={() => {
+                  if (checkAuth()) {
+                    navigate("/projects");
+                  }
+                }}
                 className="hover:bg-white p-1 hover:text-green-400 hover:rounded-lg"
               >
                 Find projects <span aria-hidden="true">&rarr;</span>

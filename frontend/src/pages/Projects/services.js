@@ -16,7 +16,7 @@ export async function getAllProjects() {
   }
 }
 
-export async function addParticipantToFB(participant, projectId, note) {
+export async function addParticipantToFB(participant, projectId, note, address) {
   try {
     // fetch all participants
     const projectCol = collection(db, "projects", projectId, "participants");
@@ -33,7 +33,7 @@ export async function addParticipantToFB(participant, projectId, note) {
 
     const docRef = await addDoc(
       collection(db, "projects", projectId, "participants"),
-      { participant, alloted: false, projectId, note }
+      { participant, alloted: false, projectId, note, address }
     );
     console.log("Document written with ID: ", docRef.id);
     // console.log(note);

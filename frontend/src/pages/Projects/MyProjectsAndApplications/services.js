@@ -46,7 +46,12 @@ export async function getParticipantsOfProject(projectId) {
   }
 }
 
-export async function assignProjectOnFb(participantId, projectId, username) {
+export async function assignProjectOnFb(
+  participantId,
+  projectId,
+  username,
+  address
+) {
   try {
     console.log(
       "Project marked as assigned",
@@ -66,6 +71,7 @@ export async function assignProjectOnFb(participantId, projectId, username) {
     await updateDoc(doc(db, "projects", projectId), {
       assigned: true,
       assignee: username,
+      cryptolancerAddress: address,
     });
     console.log(
       "Project marked as assigned",

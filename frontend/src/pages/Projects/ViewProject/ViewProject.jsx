@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { BiGitMerge } from "react-icons/bi";
 import { toast } from "react-hot-toast";
 import { addParticipantToFB } from "../services";
+import { getUserAddress } from "../../../contracts/services";
 
 const user = JSON.parse(sessionStorage.getItem("cryptoLancerUser"));
 
@@ -13,7 +14,6 @@ export const ViewProject = (props) => {
   const { projectId } = useParams();
   const pid = projectId || props.pid;
   const [note, setNote] = useState("");
-
 
   const tabs = [
     { path: "/projects", title: "Projects" },
@@ -38,22 +38,32 @@ export const ViewProject = (props) => {
       sessionStorage.getItem("cryptoLancerUser") &&
       sessionStorage.getItem("githubToken")
     ) {
-      await toast.promise(addParticipantToFB(user.username, pid, note), {
-        loading: "Adding you to the project...",
-        success: (data) => {
-          return data;
-        },
-        error: (err) => {
-          return "Something went wrong!";
-        },
-      });
+      const res = await getUserAddress();
+      if (res.success) {
+        let address = res.address;
+        await toast.promise(
+          addParticipantToFB(user.username, pid, note, address),
+          {
+            loading: "Adding you to the project...",
+            success: (data) => {
+              return data;
+            },
+            error: (err) => {
+              return "Something went wrong!";
+            },
+          }
+        );
+      } else {
+        toast("Please connect wallet", {
+          icon: "🙋🏻",
+        });
+      }
     } else {
-      toast("Please sign in to continue", {
+      toast("Connect github to continue", {
         icon: "🙋🏻",
       });
     }
   };
-
 
   return (
     <>
@@ -86,21 +96,27 @@ export const ViewProject = (props) => {
                 </span>
               </button>
             ) : (
-              <div className="flex items-center w-full">
+              <div className="flex items-center justify-center w-full">
+                <form className="mx-4 grow flex items-center">
+                  <label for="note">Add Note: </label>
+                  <input
+                    className="grow border-2 mx-2 rounded-md p-2 "
+                    id="note"
+                    name="note"
+                    placeholder="show off ur skills here ;)"
+                    type="textarea"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                  ></input>
+                </form>
                 <button
                   onClick={handleClick}
-                  className="relative mt-4 inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-teal-300 to-lime-300 group-hover:from-teal-300 group-hover:to-lime-300 focus:ring-4 focus:outline-none focus:ring-lime-200"
+                  className="relative mt-2 inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-teal-300 to-lime-300 group-hover:from-teal-300 group-hover:to-lime-300 focus:ring-4 focus:outline-none focus:ring-lime-200"
                 >
                   <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white rounded-md group-hover:bg-opacity-0">
                     Interested
                   </span>
                 </button>
-                <form className="mx-4 grow flex items-center">
-                  <label for="note">Type your message here: </label>
-                  <input className="grow border-2 mx-2 rounded-md p-2 " id="note" name="note" placeholder="Note to the owner" type="text"
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}></input>
-                </form>
               </div>
             )}
           </div>

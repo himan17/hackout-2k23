@@ -11,11 +11,20 @@ import { AiFillGithub } from "react-icons/ai";
 import { BsChatLeftText } from "react-icons/bs";
 import { toast } from "react-hot-toast";
 import { MilestoneCard } from "../../../../components/MilestoneCard/MilestoneCard";
+import {
+  add_first_assignee,
+  getAssigneeAddressOnBC,
+  getContractBalance,
+  getUserAddress,
+  mark_milestone_as_complete,
+} from "../../../../contracts/services";
 
 export const ManageProject = () => {
   const [project, setProject] = useState({});
   const [update, setUpdate] = useState(0);
   const [list, setList] = useState([]);
+  const [assigneeAddress, setAssigneeAddress] = useState("");
+  const [availableFunds, setAvailableFunds] = useState(0);
 
   const { projectId } = useParams();
   const tabs = [
@@ -26,35 +35,114 @@ export const ManageProject = () => {
     },
   ];
 
-  const assignProject = async (id, username) => {
+  const assignProject = async (id, username, address) => {
     // in participant - mark assigned true
     // in project - mark alloted true
-    await toast.promise(assignProjectOnFb(id, projectId, username), {
-      loading: `Assigning project to ${username}`,
-      success: `Assigned successfully`,
-      error: "Some error occured, contact support",
-    });
-    setUpdate(update + 1);
-    // createSmartContract();
+    let res = await getUserAddress();
+    if (res.success) {
+      // update the smart contract
+      // fetch project details
+      const tl = toast.loading("Assigning project to cryptolancer");
+      const project = await getProjectFromFB(projectId);
+
+      const contractAddress = project?.contractAddress;
+
+      let result = await add_first_assignee(contractAddress, address);
+      toast.dismiss(tl);
+      if (result.success) {
+        await toast.promise(
+          assignProjectOnFb(id, projectId, username, address),
+          {
+            loading: `Saving project`,
+            success: `Assigned successfully`,
+            error: "Some error occured, contact support",
+          }
+        );
+        setUpdate(update + 1);
+      } else {
+        toast.error("Internal error occured, contact support");
+      }
+    } else {
+      toast("Please connect wallet", {
+        icon: "🙋🏻",
+      });
+    }
   };
 
   const finishMilestone = async (milestoneId, projectId) => {
-    // mark milestone as finished in the db
-    await toast.promise(finishMilestoneInFb(milestoneId, projectId), {
-      loading: "Updating milestone status",
-      success: "Milestone updated",
-      error: "Some error occured",
-    });
-    // finishMilestoneReleaseCryptoInSC()
-    setUpdate(update + 1);
+    try {
+      const tl = toast.loading("Releasing reward to assignee");
+
+      const contractAddress = project?.contractAddress;
+
+      let result = await mark_milestone_as_complete(contractAddress);
+
+      toast.dismiss(tl);
+
+      if (result.success) {
+        toast.success("Reward released");
+        // release reward to the assignee
+
+        // mark milestone as finished in the db
+        await toast.promise(finishMilestoneInFb(milestoneId, projectId), {
+          loading: "Updating milestone status",
+          success: "Milestone updated",
+          error: "Some error occured",
+        });
+        // finishMilestoneReleaseCryptoInSC()
+        setUpdate(update + 1);
+      } else {
+        toast.error("Some error occured");
+      }
+    } catch (er) {}
   };
+
+  const getAssigneeAddress = async () => {
+    try {
+      const tl = toast.loading("Fetching assignee address");
+
+      const contractAddress = project?.contractAddress;
+
+      let result = await getAssigneeAddressOnBC(contractAddress);
+      toast.dismiss(tl);
+      if (result.success) {
+        toast.success("Address fetched");
+        console.log(result.assigneeAddress);
+        setAssigneeAddress(result.assigneeAddress);
+      } else {
+        toast.error("Some error occured");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getAvailableFunds = async () => {
+    try {
+      const tl = toast.loading("Fetching funds");
+      const contractAddress = project?.contractAddress;
+
+      let result = await getContractBalance(contractAddress);
+      toast.dismiss(tl);
+      if (result.success) {
+        toast.success("Address fetched");
+        console.log(result.balance);
+        setAvailableFunds(result.balance);
+      } else {
+        toast.error("Some error occured");
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Some error occured");
+    }
+  };
+
   useEffect(() => {
     getProjectFromFB(projectId).then((project) => {
-      console.log(project, update);
       setProject(project);
       getParticipantsOfProject(projectId).then((list) => setList(list));
     });
-  }, [update, projectId]);
+  }, []);
 
   return (
     <>
@@ -64,7 +152,46 @@ export const ManageProject = () => {
           <>
             {/* Milestone Section  */}
             <div className="flex flex-row justify-between">
-              <p className="font-medium text-2xl inline-block">Milestones</p>
+              <div>
+                <p className="font-medium text-2xl inline-block">Milestones</p>
+                <div className="mt-4 text-sm text-gray-600">
+                  <p>
+                    Contract Address: <span>{project?.contractAddress}</span>
+                  </p>
+                  <p className="my-1">
+                    Assignee Address:{" "}
+                    {assigneeAddress ? (
+                      assigneeAddress
+                    ) : (
+                      <button
+                        onClick={() => {
+                          console.log("clicked");
+                          getAssigneeAddress();
+                        }}
+                        className="rounded-md px-2 py-0.5 text-white bg-gray-600 hover:bg-gray-400"
+                      >
+                        Check
+                      </button>
+                    )}
+                  </p>
+                  <p className="my-1">
+                    Available Funds:{" "}
+                    {availableFunds ? (
+                      availableFunds + " USD"
+                    ) : (
+                      <button
+                        onClick={() => {
+                          console.log("clicked");
+                          getAvailableFunds();
+                        }}
+                        className="rounded-md px-2 py-0.5 text-white bg-gray-600 hover:bg-gray-400"
+                      >
+                        Check
+                      </button>
+                    )}
+                  </p>
+                </div>
+              </div>
               <div className="inline-block">
                 <p className="pb-1 font-medium">
                   CryptoLancer:{" "}
@@ -154,7 +281,7 @@ export const ManageProject = () => {
                 {list?.map((e) => (
                   <li
                     key={e.id}
-                    className="bg-white m-1 my-2 flex flex-row justify-between p-2 rounded-lg"
+                    className="bg-white m-1 my-2 flex flex-row justify-between items-center p-2 rounded-lg"
                   >
                     <a
                       className="font-medium text-sm text-lime-700 text-center flex items-center"
@@ -163,16 +290,20 @@ export const ManageProject = () => {
                       <AiFillGithub className="text-2xl inline-block my-auto mx-1" />
                       {e?.participant}
                     </a>
-                    <div className={`${e?.note ? "mx-4 border p-4 text-center rounded-lg bg-gray-100":""}`}>
-                      {e?.note?
-                        <>{e.note}</>
-                      :
-                        <></>
-                      }
+                    <div
+                      className={`${
+                        e?.note
+                          ? "mx-4 border p-4 text-center rounded-lg bg-gray-100"
+                          : ""
+                      }`}
+                    >
+                      {e?.note ? <>{e.note}</> : <></>}
                     </div>
                     <button
-                      onClick={() => assignProject(e?.id, e?.participant)}
-                      className="bg-blue-600 text-sm font-bold hover:bg-blue-400 p-3 text-white rounded-lg"
+                      onClick={() =>
+                        assignProject(e?.id, e?.participant, e?.address)
+                      }
+                      className="bg-blue-600 text-sm font-bold hover:bg-blue-400 py-2 h-fit px-6 text-white rounded-lg"
                     >
                       Assign
                     </button>
