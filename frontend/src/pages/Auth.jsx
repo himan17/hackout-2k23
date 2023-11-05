@@ -16,7 +16,7 @@ export const Auth = () => {
   }
   return (
     <>
-      <div className="absolute flex sm:flex-row flex-col z-20 top-8 right-8 ">
+      <div className="absolute flex sm:flex-row flex-col z-20 top-7 right-8 items-center">
         {githubLogin && (
           <>
             <button
@@ -39,7 +39,7 @@ export const Auth = () => {
         )}
         <button
           type="button"
-          className=" text-white hover:text-green-400 bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 "
+          className=" text-white hover:text-green-400 bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 h-fit py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 "
           onClick={() => {
             if (!githubLogin) {
               window.open(
@@ -73,7 +73,7 @@ export const Auth = () => {
               ></path>
             </svg>
           )}
-          {githubLogin ? user.username : "Sign in with Github"}
+          {githubLogin ? user.username : "Connect Github"}
         </button>
         <WalletProvider />
       </div>
